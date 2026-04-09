@@ -10,337 +10,77 @@
   <title>タスク登録</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
-      background: #eef2f7;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      padding: 16px 12px 32px;
-    }
-
-    .card {
-      width: 100%;
-      max-width: 480px;
-      background: #fff;
-      border-radius: 20px;
-      padding: 22px 20px 24px;
-      box-shadow: 0 4px 24px rgba(66,133,244,0.10);
-    }
-
-    /* ── ヘッダー ── */
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 18px;
-    }
-    .header h1 {
-      font-size: 17px;
-      font-weight: 700;
-      color: #1a1a2e;
-      letter-spacing: 0.2px;
-    }
-    .cfg-btn {
-      background: none;
-      border: none;
-      cursor: pointer;
-      font-size: 20px;
-      line-height: 1;
-      padding: 4px;
-      opacity: 0.5;
-      transition: opacity 0.15s;
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif; background: #eef2f7; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 16px 12px 32px; }
+    .card { width: 100%; max-width: 480px; background: #fff; border-radius: 20px; padding: 22px 20px 24px; box-shadow: 0 4px 24px rgba(66,133,244,0.10); }
+    .header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .header h1 { font-size: 17px; font-weight: 700; color: #1a1a2e; letter-spacing: 0.2px; }
+    .cfg-btn { background: none; border: none; cursor: pointer; font-size: 20px; line-height: 1; padding: 4px; opacity: 0.5; transition: opacity 0.15s; }
     .cfg-btn:hover { opacity: 1; }
-
-    /* ── 設定パネル ── */
-    .cfg-panel {
-      display: none;
-      background: #f4f7fc;
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 16px;
-      border: 1.5px solid #dde6f5;
-    }
+    .cfg-panel { display: none; background: #f4f7fc; border-radius: 14px; padding: 16px; margin-bottom: 16px; border: 1.5px solid #dde6f5; }
     .cfg-panel.open { display: block; }
-    .cfg-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: #4285f4;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      margin-bottom: 6px;
-      display: block;
-    }
-    .cfg-panel input[type="text"] {
-      width: 100%;
-      padding: 10px 12px;
-      border: 1.5px solid #d0dced;
-      border-radius: 10px;
-      font-size: 13px;
-      font-family: monospace;
-      outline: none;
-      color: #333;
-      background: #fff;
-      transition: border-color 0.2s;
-    }
+    .cfg-label { font-size: 11px; font-weight: 700; color: #4285f4; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; display: block; }
+    .cfg-panel input[type="text"] { width: 100%; padding: 10px 12px; border: 1.5px solid #d0dced; border-radius: 10px; font-size: 13px; font-family: monospace; outline: none; color: #333; background: #fff; transition: border-color 0.2s; }
     .cfg-panel input[type="text"]:focus { border-color: #4285f4; }
-    .cfg-hint {
-      font-size: 11px;
-      color: #888;
-      margin-top: 6px;
-      line-height: 1.5;
-    }
-    .btn-save-cfg {
-      width: 100%;
-      padding: 10px;
-      background: #4285f4;
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 10px;
-      transition: background 0.15s;
-    }
+    .cfg-hint { font-size: 11px; color: #888; margin-top: 6px; line-height: 1.5; }
+    .btn-save-cfg { width: 100%; padding: 10px; background: #4285f4; color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 10px; transition: background 0.15s; }
     .btn-save-cfg:hover { background: #3367d6; }
-
-    /* ── ログインセクション ── */
-    #loginSection {
-      text-align: center;
-      padding: 16px 0 8px;
-    }
-    .login-desc {
-      font-size: 14px;
-      color: #666;
-      line-height: 1.6;
-      margin-bottom: 18px;
-    }
-    .btn-login {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 13px 28px;
-      background: #4285f4;
-      color: #fff;
-      border: none;
-      border-radius: 50px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: background 0.15s, transform 0.1s;
-      box-shadow: 0 2px 10px rgba(66,133,244,0.30);
-    }
+    #loginSection { text-align: center; padding: 16px 0 8px; }
+    .login-desc { font-size: 14px; color: #666; line-height: 1.6; margin-bottom: 18px; }
+    .btn-login { display: inline-flex; align-items: center; gap: 10px; padding: 13px 28px; background: #4285f4; color: #fff; border: none; border-radius: 50px; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.15s, transform 0.1s; box-shadow: 0 2px 10px rgba(66,133,244,0.30); }
     .btn-login:active { transform: scale(0.97); }
     .btn-login:hover { background: #3367d6; }
-    .login-note {
-      font-size: 11px;
-      color: #bbb;
-      margin-top: 14px;
-    }
-
-    /* ── アプリ本体 ── */
+    .login-note { font-size: 11px; color: #bbb; margin-top: 14px; }
     #appSection { display: none; }
-
-    .task-input {
-      width: 100%;
-      font-size: 19px;
-      padding: 14px 16px;
-      border: 2px solid #e4eaf4;
-      border-radius: 14px;
-      outline: none;
-      color: #1a1a2e;
-      background: #fafcff;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      -webkit-appearance: none;
-    }
-    .task-input:focus {
-      border-color: #4285f4;
-      box-shadow: 0 0 0 3px rgba(66,133,244,0.12);
-      background: #fff;
-    }
+    .task-input { width: 100%; font-size: 19px; padding: 14px 16px; border: 2px solid #e4eaf4; border-radius: 14px; outline: none; color: #1a1a2e; background: #fafcff; transition: border-color 0.2s, box-shadow 0.2s; -webkit-appearance: none; }
+    .task-input:focus { border-color: #4285f4; box-shadow: 0 0 0 3px rgba(66,133,244,0.12); background: #fff; }
     .task-input::placeholder { color: #b0bac8; }
-
-    /* ── 日付セクション ── */
-    .section-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: #888;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-      margin: 18px 0 8px;
-    }
-    .date-btns {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    .btn-date {
-      flex: 1;
-      padding: 10px 8px;
-      border: 2px solid #e4eaf4;
-      border-radius: 12px;
-      background: #fff;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s;
-      color: #555;
-    }
-    .btn-date.active {
-      background: #4285f4;
-      border-color: #4285f4;
-      color: #fff;
-    }
-    .btn-date:not(.active):active {
-      background: #f0f4ff;
-    }
-
-    input[type="date"],
-    input[type="time"] {
-      width: 100%;
-      padding: 10px 12px;
-      border: 2px solid #e4eaf4;
-      border-radius: 12px;
-      font-size: 14px;
-      outline: none;
-      color: #333;
-      background: #fafcff;
-      transition: border-color 0.2s;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-    input[type="date"]:focus,
-    input[type="time"]:focus { border-color: #4285f4; }
-
-    /* ── 時間トグル ── */
-    .time-toggle-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 14px 0 6px;
-      cursor: pointer;
-    }
-    .switch {
-      position: relative;
-      width: 42px;
-      height: 24px;
-      flex-shrink: 0;
-    }
+    .section-label { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.6px; margin: 18px 0 8px; }
+    .date-btns { display: flex; gap: 8px; margin-bottom: 8px; }
+    .btn-date { flex: 1; padding: 10px 8px; border: 2px solid #e4eaf4; border-radius: 12px; background: #fff; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; color: #555; }
+    .btn-date.active { background: #4285f4; border-color: #4285f4; color: #fff; }
+    .btn-date:not(.active):active { background: #f0f4ff; }
+    input[type="date"], input[type="time"] { width: 100%; padding: 10px 12px; border: 2px solid #e4eaf4; border-radius: 12px; font-size: 14px; outline: none; color: #333; background: #fafcff; transition: border-color 0.2s; -webkit-appearance: none; appearance: none; }
+    input[type="date"]:focus, input[type="time"]:focus { border-color: #4285f4; }
+    .time-toggle-row { display: flex; align-items: center; gap: 10px; margin: 14px 0 6px; cursor: pointer; }
+    .switch { position: relative; width: 42px; height: 24px; flex-shrink: 0; }
     .switch input { opacity: 0; width: 0; height: 0; }
-    .switch-track {
-      position: absolute;
-      inset: 0;
-      background: #cdd5e0;
-      border-radius: 24px;
-      transition: background 0.25s;
-    }
-    .switch-thumb {
-      position: absolute;
-      width: 18px;
-      height: 18px;
-      left: 3px;
-      top: 3px;
-      background: #fff;
-      border-radius: 50%;
-      transition: transform 0.25s;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.18);
-    }
+    .switch-track { position: absolute; inset: 0; background: #cdd5e0; border-radius: 24px; transition: background 0.25s; }
+    .switch-thumb { position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform 0.25s; box-shadow: 0 1px 4px rgba(0,0,0,0.18); }
     .switch input:checked ~ .switch-track { background: #4285f4; }
     .switch input:checked ~ .switch-thumb { transform: translateX(18px); }
     .toggle-label { font-size: 14px; color: #444; }
-
-    .time-wrap {
-      overflow: hidden;
-      max-height: 0;
-      transition: max-height 0.25s ease;
-    }
+    .time-wrap { overflow: hidden; max-height: 0; transition: max-height 0.25s ease; }
     .time-wrap.open { max-height: 60px; }
     .time-inner { padding-top: 2px; }
-
-    /* ── 登録ボタン ── */
-    .btn-register {
-      width: 100%;
-      padding: 16px;
-      background: #4285f4;
-      color: #fff;
-      border: none;
-      border-radius: 14px;
-      font-size: 17px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 22px;
-      transition: background 0.15s, transform 0.1s;
-      box-shadow: 0 3px 12px rgba(66,133,244,0.25);
-      letter-spacing: 0.3px;
-    }
+    .btn-register { width: 100%; padding: 16px; background: #4285f4; color: #fff; border: none; border-radius: 14px; font-size: 17px; font-weight: 700; cursor: pointer; margin-top: 22px; transition: background 0.15s, transform 0.1s; box-shadow: 0 3px 12px rgba(66,133,244,0.25); letter-spacing: 0.3px; }
     .btn-register:hover { background: #3367d6; }
     .btn-register:active { transform: scale(0.98); }
-    .btn-register:disabled {
-      background: #b0bac8;
-      box-shadow: none;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* ── ステータス ── */
-    .status {
-      display: none;
-      margin-top: 14px;
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 500;
-      text-align: center;
-      animation: fadeIn 0.2s ease;
-    }
+    .btn-register:disabled { background: #b0bac8; box-shadow: none; cursor: not-allowed; transform: none; }
+    .status { display: none; margin-top: 14px; padding: 12px 16px; border-radius: 12px; font-size: 14px; font-weight: 500; text-align: center; animation: fadeIn 0.2s ease; }
     .status.success { display: block; background: #e8f5e9; color: #2e7d32; }
-    .status.error   { display: block; background: #ffebee; color: #c62828; }
-    .status.info    { display: block; background: #e3f2fd; color: #1565c0; }
-
+    .status.error { display: block; background: #ffebee; color: #c62828; }
+    .status.info { display: block; background: #e3f2fd; color: #1565c0; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-
-    /* ── ログアウトリンク ── */
-    .logout-row {
-      text-align: right;
-      margin-bottom: 6px;
-    }
-    .btn-logout {
-      background: none;
-      border: none;
-      font-size: 11px;
-      color: #aaa;
-      cursor: pointer;
-      padding: 2px 4px;
-    }
+    #mobileHint { display: none; }
+    .btn-tap-hint { width: 100%; padding: 20px; background: linear-gradient(135deg, #4285f4 0%, #34a0ea 100%); color: #fff; border: none; border-radius: 14px; font-size: 19px; font-weight: 700; cursor: pointer; margin-bottom: 16px; box-shadow: 0 4px 18px rgba(66,133,244,0.38); letter-spacing: 0.3px; animation: tapPulse 2s ease infinite; }
+    @keyframes tapPulse { 0%, 100% { box-shadow: 0 4px 18px rgba(66,133,244,0.38); transform: translateY(0); } 50% { box-shadow: 0 7px 26px rgba(66,133,244,0.55); transform: translateY(-2px); } }
+    .logout-row { text-align: right; margin-bottom: 6px; }
+    .btn-logout { background: none; border: none; font-size: 11px; color: #aaa; cursor: pointer; padding: 2px 4px; }
     .btn-logout:hover { color: #e53935; text-decoration: underline; }
   </style>
 </head>
 <body>
 <div class="card">
-
-  <!-- ヘッダー -->
   <div class="header">
     <h1>📝 タスク登録</h1>
     <button class="cfg-btn" id="cfgToggle" title="設定" onclick="toggleCfg()">⚙️</button>
   </div>
-
-  <!-- 設定パネル（Client ID入力） -->
   <div class="cfg-panel" id="cfgPanel">
     <label class="cfg-label">Google OAuth Client ID</label>
     <input type="text" id="clientIdInput" placeholder="xxxxxxxxxx.apps.googleusercontent.com" autocomplete="off" />
-    <p class="cfg-hint">
-      Google Cloud Console → 認証情報 → OAuth 2.0 クライアント ID<br>
-      で取得したClient IDをここに貼り付けてください
-    </p>
+    <p class="cfg-hint">Google Cloud Console → 認証情報 → OAuth 2.0 クライアント ID<br>で取得したClient IDをここに貼り付けてください</p>
     <button class="btn-save-cfg" onclick="saveConfig()">💾 保存してログイン</button>
   </div>
-
-  <!-- ログインセクション -->
   <div id="loginSection">
     <p class="login-desc">Googleアカウントでログインして<br>タスクを登録できるようにします</p>
     <button class="btn-login" onclick="handleLogin()">
@@ -354,31 +94,20 @@
     </button>
     <p class="login-note">初回は ⚙️ からClient IDを設定してください</p>
   </div>
-
-  <!-- アプリ本体 -->
   <div id="appSection">
+    <div id="mobileHint">
+      <button class="btn-tap-hint" onclick="startInput()">⌨️ タップして入力開始</button>
+    </div>
     <div class="logout-row">
       <button class="btn-logout" onclick="handleLogout()">ログアウト</button>
     </div>
-
-    <input
-      type="text"
-      class="task-input"
-      id="taskInput"
-      placeholder="タスクを入力..."
-      autocomplete="off"
-      autocorrect="off"
-      autocapitalize="sentences"
-      autofocus
-    />
-
+    <input type="text" class="task-input" id="taskInput" placeholder="タスクを入力..." autocomplete="off" autocorrect="off" autocapitalize="sentences" autofocus />
     <div class="section-label">📅 日付</div>
     <div class="date-btns">
-      <button class="btn-date active" id="btnToday"    onclick="setDate('today')">今日</button>
-      <button class="btn-date"        id="btnTomorrow" onclick="setDate('tomorrow')">明日</button>
+      <button class="btn-date active" id="btnToday" onclick="setDate('today')">今日</button>
+      <button class="btn-date" id="btnTomorrow" onclick="setDate('tomorrow')">明日</button>
     </div>
     <input type="date" id="datePicker" onchange="setDate('custom')" />
-
     <div class="time-toggle-row" onclick="toggleTime()">
       <label class="switch" onclick="event.stopPropagation()">
         <input type="checkbox" id="timeToggle" onchange="toggleTime()" />
@@ -388,310 +117,44 @@
       <span class="toggle-label">⏰ 時間を指定する</span>
     </div>
     <div class="time-wrap" id="timeWrap">
-      <div class="time-inner">
-        <input type="time" id="timePicker" value="09:00" />
-      </div>
+      <div class="time-inner"><input type="time" id="timePicker" value="09:00" /></div>
     </div>
-
-    <button class="btn-register" id="registerBtn" onclick="registerTask()">
-      ✅ 登録する
-    </button>
+    <button class="btn-register" id="registerBtn" onclick="registerTask()">✅ 登録する</button>
     <div class="status" id="statusMsg"></div>
   </div>
-
 </div>
-
-<!-- Google Identity Services -->
 <script src="https://accounts.google.com/gsi/client" async></script>
-
 <script>
-// ============================================================
-//  定数・状態
-// ============================================================
-const TASKS_API = 'https://tasks.googleapis.com/tasks/v1';
-const SCOPE     = 'https://www.googleapis.com/auth/tasks';
-
-let accessToken  = null;
-let tokenClient  = null;
-let gisReady     = false;
-let selectedDate = 'today';
-
-// ============================================================
-//  初期化
-// ============================================================
-window.addEventListener('load', () => {
-  // 保存済みClient ID を復元
-  const savedId = localStorage.getItem('gtasks_client_id');
-  if (savedId) document.getElementById('clientIdInput').value = savedId;
-
-  // 今日の日付をセット
-  const todayStr = toLocalDateStr(new Date());
-  document.getElementById('datePicker').value = todayStr;
-  document.getElementById('datePicker').min   = todayStr;
-
-  // GIS ライブラリのロード待ち
+const TASKS_API='https://tasks.googleapis.com/tasks/v1',SCOPE='https://www.googleapis.com/auth/tasks';
+let accessToken=null,tokenClient=null,gisReady=false,selectedDate='today';
+window.addEventListener('load',()=>{
+  const s=localStorage.getItem('gtasks_client_id');
+  if(s)document.getElementById('clientIdInput').value=s;
+  const t=toLocalDateStr(new Date());
+  document.getElementById('datePicker').value=t;
+  document.getElementById('datePicker').min=t;
   waitForGIS();
 });
-
-function waitForGIS() {
-  if (typeof google !== 'undefined' && google?.accounts?.oauth2) {
-    gisReady = true;
-    onGISReady();
-  } else {
-    setTimeout(waitForGIS, 150);
-  }
-}
-
-function onGISReady() {
-  const clientId = localStorage.getItem('gtasks_client_id');
-  if (clientId) {
-    buildTokenClient(clientId);
-    tryAutoLogin();
-  }
-}
-
-// ============================================================
-//  TokenClient の生成
-// ============================================================
-function buildTokenClient(clientId) {
-  tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: clientId,
-    scope: SCOPE,
-    callback: onTokenReceived
-  });
-}
-
-function onTokenReceived(resp) {
-  if (resp.error) {
-    showStatus('ログインエラー: ' + resp.error, 'error');
-    return;
-  }
-  accessToken = resp.access_token;
-  // トークンを短期保存（有効期限は約1時間）
-  const exp = Date.now() + (resp.expires_in - 60) * 1000;
-  localStorage.setItem('gtasks_token',  accessToken);
-  localStorage.setItem('gtasks_token_exp', String(exp));
-  showApp();
-}
-
-// ============================================================
-//  自動ログイン（保存済みトークンを検証）
-// ============================================================
-async function tryAutoLogin() {
-  const token = localStorage.getItem('gtasks_token');
-  const exp   = Number(localStorage.getItem('gtasks_token_exp') || 0);
-  if (!token || Date.now() > exp) return;
-
-  // 簡易疎通チェック
-  try {
-    const r = await fetch(`${TASKS_API}/users/@me/lists?maxResults=1`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (r.ok) {
-      accessToken = token;
-      showApp();
-    } else {
-      clearToken();
-    }
-  } catch { /* ネット無し等はスキップ */ }
-}
-
-function clearToken() {
-  accessToken = null;
-  localStorage.removeItem('gtasks_token');
-  localStorage.removeItem('gtasks_token_exp');
-}
-
-// ============================================================
-//  設定パネル
-// ============================================================
-function toggleCfg() {
-  document.getElementById('cfgPanel').classList.toggle('open');
-}
-
-function saveConfig() {
-  const id = document.getElementById('clientIdInput').value.trim();
-  if (!id) { alert('Client IDを入力してください'); return; }
-  localStorage.setItem('gtasks_client_id', id);
-  if (gisReady) buildTokenClient(id);
-  document.getElementById('cfgPanel').classList.remove('open');
-  handleLogin();
-}
-
-// ============================================================
-//  ログイン / ログアウト
-// ============================================================
-function handleLogin() {
-  const id = localStorage.getItem('gtasks_client_id');
-  if (!id) {
-    document.getElementById('cfgPanel').classList.add('open');
-    showStatus('⚙️ まずClient IDを設定してください', 'info');
-    return;
-  }
-  if (!tokenClient) {
-    if (!gisReady) { showStatus('Google認証ライブラリ読み込み中…', 'info'); return; }
-    buildTokenClient(id);
-  }
-  tokenClient.requestAccessToken({ prompt: 'consent' });
-}
-
-function handleLogout() {
-  if (accessToken) google.accounts.oauth2.revoke(accessToken, () => {});
-  clearToken();
-  document.getElementById('appSection').style.display  = 'none';
-  document.getElementById('loginSection').style.display = 'block';
-  document.getElementById('taskInput').value = '';
-}
-
-function showApp() {
-  document.getElementById('loginSection').style.display = 'none';
-  document.getElementById('appSection').style.display   = 'block';
-  setTimeout(() => document.getElementById('taskInput').focus(), 120);
-}
-
-// ============================================================
-//  日付ヘルパー
-// ============================================================
-function toLocalDateStr(d) {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
-  const dd = String(d.getDate()).padStart(2, '0');
-  return `${y}-${m}-${dd}`;
-}
-
-function setDate(mode) {
-  const today    = new Date();
-  const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
-
-  document.getElementById('btnToday').classList.remove('active');
-  document.getElementById('btnTomorrow').classList.remove('active');
-
-  if (mode === 'today') {
-    selectedDate = 'today';
-    document.getElementById('btnToday').classList.add('active');
-    document.getElementById('datePicker').value = toLocalDateStr(today);
-  } else if (mode === 'tomorrow') {
-    selectedDate = 'tomorrow';
-    document.getElementById('btnTomorrow').classList.add('active');
-    document.getElementById('datePicker').value = toLocalDateStr(tomorrow);
-  } else {
-    selectedDate = 'custom';
-    // ボタンのアクティブ状態を同期
-    const val = document.getElementById('datePicker').value;
-    if (val === toLocalDateStr(today))    document.getElementById('btnToday').classList.add('active');
-    if (val === toLocalDateStr(tomorrow)) document.getElementById('btnTomorrow').classList.add('active');
-  }
-}
-
-// ============================================================
-//  時間トグル
-// ============================================================
-function toggleTime() {
-  const on = document.getElementById('timeToggle').checked;
-  // checkbox が直接クリックされた場合のみチェック状態を反転しない
-  document.getElementById('timeWrap').classList.toggle('open', on);
-}
-
-// ============================================================
-//  タスク登録
-// ============================================================
-async function registerTask() {
-  const title = document.getElementById('taskInput').value.trim();
-  if (!title) {
-    showStatus('❌ タスク名を入力してください', 'error');
-    document.getElementById('taskInput').focus();
-    return;
-  }
-  if (!accessToken) {
-    showStatus('❌ ログインしてください', 'error');
-    return;
-  }
-
-  const btn = document.getElementById('registerBtn');
-  btn.disabled     = true;
-  btn.textContent  = '⏳ 登録中…';
-
-  const dateVal   = document.getElementById('datePicker').value;
-  const timeOn    = document.getElementById('timeToggle').checked;
-  const timeVal   = document.getElementById('timePicker').value;
-
-  // due 日時の組み立て（Google Tasks API は RFC3339）
-  let due;
-  if (timeOn && timeVal) {
-    // ローカル時刻 → ISO8601
-    due = new Date(`${dateVal}T${timeVal}:00`).toISOString();
-  } else {
-    // 終日：日付のみ（00:00:00Z）
-    due = `${dateVal}T00:00:00.000Z`;
-  }
-
-  try {
-    const res = await fetch(`${TASKS_API}/lists/@default/tasks`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        'Content-Type':  'application/json'
-      },
-      body: JSON.stringify({ title, due })
-    });
-
-    if (res.status === 401) {
-      clearToken();
-      showStatus('⚠️ セッション期限切れ。再ログインしてください', 'error');
-      setTimeout(() => {
-        document.getElementById('appSection').style.display  = 'none';
-        document.getElementById('loginSection').style.display = 'block';
-      }, 1800);
-      return;
-    }
-
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err?.error?.message || `HTTP ${res.status}`);
-    }
-
-    // 成功フィードバック
-    const today    = toLocalDateStr(new Date());
-    const tomorrow = toLocalDateStr(new Date(Date.now() + 86400000));
-    const label    = dateVal === today ? '今日' : dateVal === tomorrow ? '明日' : dateVal;
-    const timeLabel = timeOn && timeVal ? ` ${timeVal}` : '（終日）';
-    showStatus(`✅ 登録しました！ ${label}${timeLabel}`, 'success');
-
-    // リセット
-    document.getElementById('taskInput').value  = '';
-    document.getElementById('timeToggle').checked = false;
-    document.getElementById('timeWrap').classList.remove('open');
-    setDate('today');
-    document.getElementById('taskInput').focus();
-
-  } catch (e) {
-    showStatus('❌ 登録失敗: ' + e.message, 'error');
-  } finally {
-    btn.disabled    = false;
-    btn.textContent = '✅ 登録する';
-  }
-}
-
-// ============================================================
-//  ステータス表示
-// ============================================================
-let statusTimer = null;
-function showStatus(msg, type) {
-  const el = document.getElementById('statusMsg');
-  el.textContent = msg;
-  el.className   = `status ${type}`;
-  if (statusTimer) clearTimeout(statusTimer);
-  statusTimer = setTimeout(() => { el.className = 'status'; }, 3500);
-}
-
-// ============================================================
-//  キーボード：Enter で登録
-// ============================================================
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && document.activeElement.id === 'taskInput') {
-    registerTask();
-  }
-});
+function waitForGIS(){if(typeof google!=='undefined'&&google?.accounts?.oauth2){gisReady=true;onGISReady();}else setTimeout(waitForGIS,150);}
+function onGISReady(){const c=localStorage.getItem('gtasks_client_id');if(c){buildTokenClient(c);tryAutoLogin();}}
+function buildTokenClient(c){tokenClient=google.accounts.oauth2.initTokenClient({client_id:c,scope:SCOPE,callback:onTokenReceived});}
+function onTokenReceived(r){if(r.error){showStatus('ログインエラー: '+r.error,'error');return;}accessToken=r.access_token;const e=Date.now()+(r.expires_in-60)*1000;localStorage.setItem('gtasks_token',accessToken);localStorage.setItem('gtasks_token_exp',String(e));showApp();}
+async function tryAutoLogin(){const t=localStorage.getItem('gtasks_token'),e=Number(localStorage.getItem('gtasks_token_exp')||0);if(!t||Date.now()>e)return;try{const r=await fetch(TASKS_API+'/users/@me/lists?maxResults=1',{headers:{Authorization:'Bearer '+t}});if(r.ok){accessToken=t;showApp();}else clearToken();}catch(e){}}
+function clearToken(){accessToken=null;localStorage.removeItem('gtasks_token');localStorage.removeItem('gtasks_token_exp');}
+function toggleCfg(){document.getElementById('cfgPanel').classList.toggle('open');}
+function saveConfig(){const i=document.getElementById('clientIdInput').value.trim();if(!i){alert('Client IDを入力してください');return;}localStorage.setItem('gtasks_client_id',i);if(gisReady)buildTokenClient(i);document.getElementById('cfgPanel').classList.remove('open');handleLogin();}
+function handleLogin(){const i=localStorage.getItem('gtasks_client_id');if(!i){document.getElementById('cfgPanel').classList.add('open');showStatus('⚙️ まずClient IDを設定してください','info');return;}if(!tokenClient){if(!gisReady){showStatus('Google認証ライブラリ読み込み中…','info');return;}buildTokenClient(i);}tokenClient.requestAccessToken({prompt:'consent'});}
+function handleLogout(){if(accessToken)google.accounts.oauth2.revoke(accessToken,()=>{});clearToken();document.getElementById('appSection').style.display='none';document.getElementById('loginSection').style.display='block';document.getElementById('taskInput').value='';}
+function showApp(){document.getElementById('loginSection').style.display='none';document.getElementById('appSection').style.display='block';if(isMobile()){document.getElementById('mobileHint').style.display='block';document.getElementById('taskInput').style.display='none';}else setTimeout(()=>document.getElementById('taskInput').focus(),120);}
+function isMobile(){return 'ontouchstart' in window&&navigator.maxTouchPoints>0;}
+function startInput(){document.getElementById('mobileHint').style.display='none';document.getElementById('taskInput').style.display='';document.getElementById('taskInput').focus();}
+function toLocalDateStr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function setDate(m){const t=new Date(),n=new Date(t);n.setDate(t.getDate()+1);document.getElementById('btnToday').classList.remove('active');document.getElementById('btnTomorrow').classList.remove('active');if(m==='today'){selectedDate='today';document.getElementById('btnToday').classList.add('active');document.getElementById('datePicker').value=toLocalDateStr(t);}else if(m==='tomorrow'){selectedDate='tomorrow';document.getElementById('btnTomorrow').classList.add('active');document.getElementById('datePicker').value=toLocalDateStr(n);}else{selectedDate='custom';const v=document.getElementById('datePicker').value;if(v===toLocalDateStr(t))document.getElementById('btnToday').classList.add('active');if(v===toLocalDateStr(n))document.getElementById('btnTomorrow').classList.add('active');}}
+function toggleTime(){const o=document.getElementById('timeToggle').checked;document.getElementById('timeWrap').classList.toggle('open',o);}
+async function registerTask(){const title=document.getElementById('taskInput').value.trim();if(!title){showStatus('❌ タスク名を入力してください','error');document.getElementById('taskInput').focus();return;}if(!accessToken){showStatus('❌ ログインしてください','error');return;}const btn=document.getElementById('registerBtn');btn.disabled=true;btn.textContent='⏳ 登録中…';const dv=document.getElementById('datePicker').value,to=document.getElementById('timeToggle').checked,tv=document.getElementById('timePicker').value;const due=to&&tv?new Date(dv+'T'+tv+':00').toISOString():dv+'T00:00:00.000Z';try{const res=await fetch(TASKS_API+'/lists/@default/tasks',{method:'POST',headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},body:JSON.stringify({title,due})});if(res.status===401){clearToken();showStatus('⚠️ セッション期限切れ。再ログインしてください','error');setTimeout(()=>{document.getElementById('appSection').style.display='none';document.getElementById('loginSection').style.display='block';},1800);return;}if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error((e&&e.error&&e.error.message)||'HTTP '+res.status);}const td=toLocalDateStr(new Date()),tm=toLocalDateStr(new Date(Date.now()+86400000));showStatus('✅ 登録しました！ '+(dv===td?'今日':dv===tm?'明日':dv)+(to&&tv?' '+tv:'（終日）'),'success');document.getElementById('taskInput').value='';document.getElementById('timeToggle').checked=false;document.getElementById('timeWrap').classList.remove('open');setDate('today');if(isMobile()){document.getElementById('taskInput').style.display='none';document.getElementById('mobileHint').style.display='block';}else document.getElementById('taskInput').focus();}catch(e){showStatus('❌ 登録失敗: '+e.message,'error');}finally{btn.disabled=false;btn.textContent='✅ 登録する';}}
+let st=null;
+function showStatus(m,t){const el=document.getElementById('statusMsg');el.textContent=m;el.className='status '+t;if(st)clearTimeout(st);st=setTimeout(()=>{el.className='status';},3500);}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.activeElement.id==='taskInput')registerTask();});
 </script>
 </body>
 </html>
