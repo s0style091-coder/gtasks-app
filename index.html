@@ -127,6 +127,7 @@
 <script>
 const TASKS_API='https://tasks.googleapis.com/tasks/v1',SCOPE='https://www.googleapis.com/auth/tasks';
 let accessToken=null,tokenClient=null,gisReady=false,selectedDate='today';
+
 window.addEventListener('load',()=>{
   const s=localStorage.getItem('gtasks_client_id');
   if(s)document.getElementById('clientIdInput').value=s;
@@ -135,26 +136,149 @@ window.addEventListener('load',()=>{
   document.getElementById('datePicker').min=t;
   waitForGIS();
 });
-function waitForGIS(){if(typeof google!=='undefined'&&google?.accounts?.oauth2){gisReady=true;onGISReady();}else setTimeout(waitForGIS,150);}
-function onGISReady(){const c=localStorage.getItem('gtasks_client_id');if(c){buildTokenClient(c);tryAutoLogin();}}
-function buildTokenClient(c){tokenClient=google.accounts.oauth2.initTokenClient({client_id:c,scope:SCOPE,callback:onTokenReceived});}
-function onTokenReceived(r){if(r.error){showStatus('ログインエラー: '+r.error,'error');return;}accessToken=r.access_token;const e=Date.now()+(r.expires_in-60)*1000;localStorage.setItem('gtasks_token',accessToken);localStorage.setItem('gtasks_token_exp',String(e));showApp();}
-async function tryAutoLogin(){const t=localStorage.getItem('gtasks_token'),e=Number(localStorage.getItem('gtasks_token_exp')||0);if(!t||Date.now()>e)return;try{const r=await fetch(TASKS_API+'/users/@me/lists?maxResults=1',{headers:{Authorization:'Bearer '+t}});if(r.ok){accessToken=t;showApp();}else clearToken();}catch(e){}}
-function clearToken(){accessToken=null;localStorage.removeItem('gtasks_token');localStorage.removeItem('gtasks_token_exp');}
+
+function waitForGIS(){
+  if(typeof google!=='undefined'&&google?.accounts?.oauth2){gisReady=true;onGISReady();}
+  else setTimeout(waitForGIS,150);
+}
+function onGISReady(){
+  const c=localStorage.getItem('gtasks_client_id');
+  if(c){buildTokenClient(c);tryAutoLogin();}
+}
+function buildTokenClient(c){
+  tokenClient=google.accounts.oauth2.initTokenClient({client_id:c,scope:SCOPE,callback:onTokenReceived});
+}
+function onTokenReceived(r){
+  if(r.error){
+    // サイレント取得失敗（interaction_required等）→ ログイン画面のまま表示
+    if(!['access_denied','interaction_required','user_logged_out'].includes(r.error)){
+      showStatus('ログインエラー: '+r.error,'error');
+    }
+    return;
+  }
+  accessToken=r.access_token;
+  const e=Date.now()+(r.expires_in-60)*1000;
+  localStorage.setItem('gtasks_token',accessToken);
+  localStorage.setItem('gtasks_token_exp',String(e));
+  showApp();
+}
+
+// トークン検証 → 期限切れならサイレント更新
+async function tryAutoLogin(){
+  const token=localStorage.getItem('gtasks_token');
+  const exp=Number(localStorage.getItem('gtasks_token_exp')||0);
+
+  if(token&&Date.now()<exp){
+    try{
+      const r=await fetch(TASKS_API+'/users/@me/lists?maxResults=1',{headers:{Authorization:'Bearer '+token}});
+      if(r.ok){accessToken=token;showApp();return;}
+    }catch(e){}
+  }
+
+  // トークン期限切れ or 無効 → ポップアップなしでサイレント取得を試みる
+  if(tokenClient){
+    tokenClient.requestAccessToken({prompt:''});
+  }
+}
+
+function clearToken(){
+  accessToken=null;
+  localStorage.removeItem('gtasks_token');
+  localStorage.removeItem('gtasks_token_exp');
+}
 function toggleCfg(){document.getElementById('cfgPanel').classList.toggle('open');}
-function saveConfig(){const i=document.getElementById('clientIdInput').value.trim();if(!i){alert('Client IDを入力してください');return;}localStorage.setItem('gtasks_client_id',i);if(gisReady)buildTokenClient(i);document.getElementById('cfgPanel').classList.remove('open');handleLogin();}
-function handleLogin(){const i=localStorage.getItem('gtasks_client_id');if(!i){document.getElementById('cfgPanel').classList.add('open');showStatus('⚙️ まずClient IDを設定してください','info');return;}if(!tokenClient){if(!gisReady){showStatus('Google認証ライブラリ読み込み中…','info');return;}buildTokenClient(i);}tokenClient.requestAccessToken({prompt:'consent'});}
-function handleLogout(){if(accessToken)google.accounts.oauth2.revoke(accessToken,()=>{});clearToken();document.getElementById('appSection').style.display='none';document.getElementById('loginSection').style.display='block';document.getElementById('taskInput').value='';}
-function showApp(){document.getElementById('loginSection').style.display='none';document.getElementById('appSection').style.display='block';if(isMobile()){document.getElementById('mobileHint').style.display='block';document.getElementById('taskInput').style.display='none';}else setTimeout(()=>document.getElementById('taskInput').focus(),120);}
+function saveConfig(){
+  const i=document.getElementById('clientIdInput').value.trim();
+  if(!i){alert('Client IDを入力してください');return;}
+  localStorage.setItem('gtasks_client_id',i);
+  if(gisReady)buildTokenClient(i);
+  document.getElementById('cfgPanel').classList.remove('open');
+  handleLogin();
+}
+function handleLogin(){
+  const i=localStorage.getItem('gtasks_client_id');
+  if(!i){document.getElementById('cfgPanel').classList.add('open');showStatus('⚙️ まずClient IDを設定してください','info');return;}
+  if(!tokenClient){if(!gisReady){showStatus('Google認証ライブラリ読み込み中…','info');return;}buildTokenClient(i);}
+  tokenClient.requestAccessToken({prompt:'consent'});
+}
+function handleLogout(){
+  if(accessToken)google.accounts.oauth2.revoke(accessToken,()=>{});
+  clearToken();
+  document.getElementById('appSection').style.display='none';
+  document.getElementById('loginSection').style.display='block';
+  document.getElementById('taskInput').value='';
+}
+function showApp(){
+  document.getElementById('loginSection').style.display='none';
+  document.getElementById('appSection').style.display='block';
+  if(isMobile()){
+    document.getElementById('mobileHint').style.display='block';
+    document.getElementById('taskInput').style.display='none';
+  }else{
+    setTimeout(()=>document.getElementById('taskInput').focus(),120);
+  }
+}
 function isMobile(){return 'ontouchstart' in window&&navigator.maxTouchPoints>0;}
-function startInput(){document.getElementById('mobileHint').style.display='none';document.getElementById('taskInput').style.display='';document.getElementById('taskInput').focus();}
-function toLocalDateStr(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function setDate(m){const t=new Date(),n=new Date(t);n.setDate(t.getDate()+1);document.getElementById('btnToday').classList.remove('active');document.getElementById('btnTomorrow').classList.remove('active');if(m==='today'){selectedDate='today';document.getElementById('btnToday').classList.add('active');document.getElementById('datePicker').value=toLocalDateStr(t);}else if(m==='tomorrow'){selectedDate='tomorrow';document.getElementById('btnTomorrow').classList.add('active');document.getElementById('datePicker').value=toLocalDateStr(n);}else{selectedDate='custom';const v=document.getElementById('datePicker').value;if(v===toLocalDateStr(t))document.getElementById('btnToday').classList.add('active');if(v===toLocalDateStr(n))document.getElementById('btnTomorrow').classList.add('active');}}
-function toggleTime(){const o=document.getElementById('timeToggle').checked;document.getElementById('timeWrap').classList.toggle('open',o);}
-async function registerTask(){const title=document.getElementById('taskInput').value.trim();if(!title){showStatus('❌ タスク名を入力してください','error');document.getElementById('taskInput').focus();return;}if(!accessToken){showStatus('❌ ログインしてください','error');return;}const btn=document.getElementById('registerBtn');btn.disabled=true;btn.textContent='⏳ 登録中…';const dv=document.getElementById('datePicker').value,to=document.getElementById('timeToggle').checked,tv=document.getElementById('timePicker').value;const due=to&&tv?new Date(dv+'T'+tv+':00').toISOString():dv+'T00:00:00.000Z';try{const res=await fetch(TASKS_API+'/lists/@default/tasks',{method:'POST',headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},body:JSON.stringify({title,due})});if(res.status===401){clearToken();showStatus('⚠️ セッション期限切れ。再ログインしてください','error');setTimeout(()=>{document.getElementById('appSection').style.display='none';document.getElementById('loginSection').style.display='block';},1800);return;}if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error((e&&e.error&&e.error.message)||'HTTP '+res.status);}const td=toLocalDateStr(new Date()),tm=toLocalDateStr(new Date(Date.now()+86400000));showStatus('✅ 登録しました！ '+(dv===td?'今日':dv===tm?'明日':dv)+(to&&tv?' '+tv:'（終日）'),'success');document.getElementById('taskInput').value='';document.getElementById('timeToggle').checked=false;document.getElementById('timeWrap').classList.remove('open');setDate('today');if(isMobile()){document.getElementById('taskInput').style.display='none';document.getElementById('mobileHint').style.display='block';}else document.getElementById('taskInput').focus();}catch(e){showStatus('❌ 登録失敗: '+e.message,'error');}finally{btn.disabled=false;btn.textContent='✅ 登録する';}}
+function startInput(){
+  document.getElementById('mobileHint').style.display='none';
+  document.getElementById('taskInput').style.display='';
+  document.getElementById('taskInput').focus();
+}
+function toLocalDateStr(d){
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function setDate(m){
+  const t=new Date(),n=new Date(t);n.setDate(t.getDate()+1);
+  document.getElementById('btnToday').classList.remove('active');
+  document.getElementById('btnTomorrow').classList.remove('active');
+  if(m==='today'){selectedDate='today';document.getElementById('btnToday').classList.add('active');document.getElementById('datePicker').value=toLocalDateStr(t);}
+  else if(m==='tomorrow'){selectedDate='tomorrow';document.getElementById('btnTomorrow').classList.add('active');document.getElementById('datePicker').value=toLocalDateStr(n);}
+  else{selectedDate='custom';const v=document.getElementById('datePicker').value;if(v===toLocalDateStr(t))document.getElementById('btnToday').classList.add('active');if(v===toLocalDateStr(n))document.getElementById('btnTomorrow').classList.add('active');}
+}
+function toggleTime(){
+  document.getElementById('timeWrap').classList.toggle('open',document.getElementById('timeToggle').checked);
+}
+async function registerTask(){
+  const title=document.getElementById('taskInput').value.trim();
+  if(!title){showStatus('❌ タスク名を入力してください','error');document.getElementById('taskInput').focus();return;}
+  if(!accessToken){showStatus('❌ ログインしてください','error');return;}
+  const btn=document.getElementById('registerBtn');
+  btn.disabled=true;btn.textContent='⏳ 登録中…';
+  const dv=document.getElementById('datePicker').value,to=document.getElementById('timeToggle').checked,tv=document.getElementById('timePicker').value;
+  const due=to&&tv?new Date(dv+'T'+tv+':00').toISOString():dv+'T00:00:00.000Z';
+  try{
+    const res=await fetch(TASKS_API+'/lists/@default/tasks',{
+      method:'POST',
+      headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
+      body:JSON.stringify({title,due})
+    });
+    if(res.status===401){
+      clearToken();showStatus('⚠️ セッション期限切れ。再ログインしてください','error');
+      setTimeout(()=>{document.getElementById('appSection').style.display='none';document.getElementById('loginSection').style.display='block';},1800);
+      return;
+    }
+    if(!res.ok){const e=await res.json().catch(()=>({}));throw new Error((e&&e.error&&e.error.message)||'HTTP '+res.status);}
+    const td=toLocalDateStr(new Date()),tm=toLocalDateStr(new Date(Date.now()+86400000));
+    showStatus('✅ 登録しました！ '+(dv===td?'今日':dv===tm?'明日':dv)+(to&&tv?' '+tv:'（終日）'),'success');
+    document.getElementById('taskInput').value='';
+    document.getElementById('timeToggle').checked=false;
+    document.getElementById('timeWrap').classList.remove('open');
+    setDate('today');
+    if(isMobile()){document.getElementById('taskInput').style.display='none';document.getElementById('mobileHint').style.display='block';}
+    else document.getElementById('taskInput').focus();
+  }catch(e){showStatus('❌ 登録失敗: '+e.message,'error');}
+  finally{btn.disabled=false;btn.textContent='✅ 登録する';}
+}
 let st=null;
-function showStatus(m,t){const el=document.getElementById('statusMsg');el.textContent=m;el.className='status '+t;if(st)clearTimeout(st);st=setTimeout(()=>{el.className='status';},3500);}
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&document.activeElement.id==='taskInput')registerTask();});
+function showStatus(m,t){
+  const el=document.getElementById('statusMsg');
+  el.textContent=m;el.className='status '+t;
+  if(st)clearTimeout(st);
+  st=setTimeout(()=>{el.className='status';},3500);
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&document.activeElement.id==='taskInput')registerTask();
+});
 </script>
 </body>
 </html>
