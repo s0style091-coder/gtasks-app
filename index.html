@@ -630,8 +630,21 @@ function onTokenReceived(resp) {
 
   // 55分後に自動サイレントリフレッシュをスケジュール
   scheduleTokenRefresh((resp.expires_in - 300) * 1000);
+  fetchAndStoreUserEmail(accessToken);
 
   showApp();
+}
+
+async function fetchAndStoreUserEmail(token) {
+  try {
+    const r = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    if (r.ok) {
+      const d = await r.json();
+      if (d.email) localStorage.setItem('gtasks_user_email', d.email);
+    }
+  } catch(e) {}
 }
 
 // ============================================================
@@ -667,8 +680,9 @@ async function tryAutoLogin() {
         silentRefreshPending = false;
         showReconnectOrLogin();
       }
-    }, 5000);
-    tokenClient.requestAccessToken({ prompt: '' });
+    }, 8000);
+    const hint = localStorage.getItem('gtasks_user_email') || undefined;
+    tokenClient.requestAccessToken({ prompt: 'none', login_hint: hint });
   } else {
     showReconnectOrLogin();
   }
@@ -682,7 +696,8 @@ function scheduleTokenRefresh(delayMs) {
   if (delayMs <= 0) return;
   refreshScheduleTimer = setTimeout(() => {
     if (accessToken && tokenClient) {
-      tokenClient.requestAccessToken({ prompt: '' });
+      const hint = localStorage.getItem('gtasks_user_email') || undefined;
+      tokenClient.requestAccessToken({ prompt: 'none', login_hint: hint });
     }
   }, delayMs);
 }
@@ -780,22 +795,14 @@ function handleLogin() {
 }
 
 function handleReconnect() {
-  // 再接続：同意画面なしでアカウント選択のみ
+  // 再接続：アカウント選択画面を直接表示
   if (!tokenClient) {
     const id = localStorage.getItem('gtasks_client_id');
     if (id && gisReady) buildTokenClient(id);
   }
   if (tokenClient) {
-    showLoading();
-    silentRefreshPending = true;
-    silentRefreshTimer = setTimeout(() => {
-      if (silentRefreshPending) {
-        silentRefreshPending = false;
-        // サイレント失敗 → select_account で試みる
-        if (tokenClient) tokenClient.requestAccessToken({ prompt: 'select_account' });
-      }
-    }, 4000);
-    tokenClient.requestAccessToken({ prompt: '' });
+    const hint = localStorage.getItem('gtasks_user_email') || undefined;
+    tokenClient.requestAccessToken({ prompt: 'select_account', login_hint: hint });
   }
 }
 
